@@ -128,7 +128,7 @@ class Avro4sSerializationSpec extends UnitSpec with WireMockFixture {
           deserializer.deserialize(topic, bytes)
           deserializer.deserialize(topic, bytes)
 
-          verify(1, getRequestedFor(urlMatching(s"/schemas/ids/$schemaId")))
+          verify(1, getRequestedFor(urlMatching(s"/schemas/ids/$schemaId\\?fetchMaxId=false")))
         }
 
         "handle a format byte in the header" in forAll { (topic: String, schemaId: Int, event: Event) =>
@@ -169,7 +169,7 @@ class Avro4sSerializationSpec extends UnitSpec with WireMockFixture {
           deserializer.deserialize(topic, bytes)
           deserializer.deserialize(topic, bytes)
 
-          verify(1, getRequestedFor(urlMatching(s"/schemas/ids/$schemaId")))
+          verify(1, getRequestedFor(urlMatching(s"/schemas/ids/$schemaId\\?fetchMaxId=false")))
         }
       }
     }
@@ -181,7 +181,7 @@ class Avro4sSerializationSpec extends UnitSpec with WireMockFixture {
     val schemaBody = "{\"schema\": \"" + schema.toString.replace(""""""", """\"""") + "\"}"
 
     stubFor(
-      get(urlMatching(s"/schemas/ids/$schemaId"))
+      get(urlMatching(s"/schemas/ids/$schemaId\\?fetchMaxId=false"))
         .willReturn(
           aResponse()
             .withBody(schemaBody)

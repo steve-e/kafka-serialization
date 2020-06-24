@@ -8,12 +8,15 @@ lazy val slf4jVersion = "1.7.30"
 lazy val sprayJsonVersion = "1.3.5"
 lazy val kafkaClientVersion = "2.3.0"
 lazy val jsoninterScalaVersion = "1.0.0"
-lazy val confluentPlatformVersion = "5.3.2"
+lazy val confluentPlatformVersion = "5.5.0"
 lazy val scalaTestVersion = "3.0.8"
 lazy val scalaCheckVersion = "1.14.3"
 lazy val scalaMockVersion = "3.6.0"
-lazy val wiremockVersion = "2.24.0"
+lazy val wiremockVersion = "2.26.3"
 lazy val scalaArmVersion = "2.0"
+lazy val commonsCodecVersion = "1.14"
+lazy val hibernateValidatorVersion = "6.1.5.Final"
+lazy val snakeYamlVersion = "1.26"
 
 lazy val `kafka-serialization` = project
   .in(file("."))
@@ -98,12 +101,13 @@ lazy val testkit = project
       "org.scalatest" %% "scalatest" % scalaTestVersion,
       "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
       "org.scalamock" %% "scalamock-scalatest-support" % scalaMockVersion,
-      "com.github.tomakehurst" % "wiremock" % wiremockVersion,
+      "com.github.tomakehurst" % "wiremock-jre8" % wiremockVersion exclude ("commons-codec", "commons-codec"),
+      "commons-codec" % "commons-codec" % commonsCodecVersion,
       "com.jsuereth" %% "scala-arm" % scalaArmVersion,
       "org.slf4j" % "log4j-over-slf4j" % slf4jVersion,
       "org.slf4j" % "jcl-over-slf4j" % slf4jVersion,
       "ch.qos.logback" % "logback-core" % logbackVersion,
-      "ch.qos.logback" % "logback-classic" % logbackVersion,
+      "ch.qos.logback" % "logback-classic" % logbackVersion
     )
   )
 
@@ -115,7 +119,7 @@ lazy val json4s = project
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       "org.json4s" %% "json4s-core" % json4sVersion,
-      "org.json4s" %% "json4s-native" % json4sVersion,
+      "org.json4s" %% "json4s-native" % json4sVersion
     )
   )
 
@@ -125,7 +129,13 @@ lazy val avro = project
   .settings(
     name := "kafka-serialization-avro",
     libraryDependencies ++= Seq(
-      "io.confluent" % "kafka-avro-serializer" % confluentPlatformVersion exclude ("org.slf4j", "slf4j-log4j12")
+      "io.confluent" % "kafka-avro-serializer" % confluentPlatformVersion excludeAll (
+        ExclusionRule(organization = "org.slf4j", name = "slf4j-log4j12"),
+        ExclusionRule(organization = "org.hibernate.validator", name = "hibernate-validator"),
+        ExclusionRule(organization = "org.yaml", name = "snakeyaml")
+      ),
+      "org.yaml" % "snakeyaml" % snakeYamlVersion,
+      "org.hibernate.validator" % "hibernate-validator" % hibernateValidatorVersion
     )
   )
 
@@ -172,7 +182,7 @@ lazy val circe = project
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-core" % circeVersion,
       "io.circe" %% "circe-parser" % circeVersion,
-      "io.circe" %% "circe-generic" % circeVersion % Test,
+      "io.circe" %% "circe-generic" % circeVersion % Test
     )
   )
 
